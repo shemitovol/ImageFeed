@@ -1,14 +1,14 @@
 import UIKit
 
-class ImagesListViewController: UIViewController {
+final class ImagesListViewController: UIViewController {
     @IBOutlet private var tableView: UITableView!
     
     private let showSingleImageIdentifier = "ShowSingleImage"
     private let photosName: [String] = Array(0..<20).map{"\($0)"}
+    private let today = Date()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.rowHeight = 200
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
     }
     
@@ -48,10 +48,11 @@ extension ImagesListViewController: UITableViewDataSource {
             return
         }
         cell.cellImage.image = image
-        cell.dateLabel.text = dateFormatter.string(from: Date())
+        cell.dateLabel.text = dateFormatter.string(from: today)
         
         let isLiked = indexPath.row % 2 == 0
-        let likeImage = isLiked ? UIImage(named: "NoActive") : UIImage(named: "Active")
+        let imageResource: ImageResource = isLiked ? .noActive : .active
+        let likeImage = UIImage(resource: imageResource)
         cell.likeButton.setImage(likeImage, for: .normal)
     }
     

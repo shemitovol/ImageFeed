@@ -5,7 +5,7 @@ final class SingleImageViewController: UIViewController {
     @IBOutlet private var scrollView: UIScrollView!
     @IBOutlet private var shareButton: UIButton!
     
-    @IBAction func didTapShareButton(_ sender: Any) {
+    @IBAction private func didTapShareButton(_ sender: Any) {
         guard let image else {return}
         let share = UIActivityViewController(
             activityItems: [image],

@@ -1,51 +1,51 @@
 import UIKit
 
 final class ProfileViewController: UIViewController {
-    private var imageView = UIImageView()
-    private var nameLabel = UILabel()
-    private var loginLabel = UILabel()
-    private var statusLabel = UILabel()
-    private var exitButton = UIButton()
+    private lazy var imageView = UIImageView()
+    private lazy var nameLabel = UILabel()
+    private lazy var loginLabel = UILabel()
+    private lazy var statusLabel = UILabel()
+    private lazy var exitButton = UIButton()
     
     override func viewDidLoad() {
-        view.backgroundColor = UIColor(named: "YPBlack")
+        view.backgroundColor = UIColor(resource: .ypBlack)
         setupViews()
         setupConstraints()
     }
     
     private func setupViews() {
-        let profileImage = UIImage(named: "Photo")
+        let profileImage = UIImage(resource: .photo)
         let imageView = UIImageView(image: profileImage)
         addSubview(imageView)
         self.imageView = imageView
 
         let nameLabel = UILabel()
         nameLabel.text = "Екатерина Новикова"
-        nameLabel.textColor = UIColor(named: "YPWhite")
+        nameLabel.textColor = UIColor(resource: .ypWhite)
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         addSubview(nameLabel)
         self.nameLabel = nameLabel
 
         let loginLabel = UILabel()
         loginLabel.text = "@ekaterina_nov"
-        loginLabel.textColor = UIColor(named: "YPGray")
+        loginLabel.textColor = UIColor(resource: .ypGray)
         loginLabel.font = UIFont.systemFont(ofSize: 13)
         addSubview(loginLabel)
         self.loginLabel = loginLabel
 
         let statusLabel = UILabel()
         statusLabel.text = "Hello, world!"
-        statusLabel.textColor = UIColor(named: "YPWhite")
+        statusLabel.textColor = UIColor(resource: .ypWhite)
         loginLabel.font = UIFont.systemFont(ofSize: 13)
         addSubview(statusLabel)
         self.statusLabel = statusLabel
         
         let exitButton = UIButton.systemButton(
-            with: UIImage(named: "Exit")!,
+            with: UIImage(resource: .exit),
             target: self,
             action: #selector(self.didTapButton)
         )
-        exitButton.tintColor = UIColor(named: "YPRed")
+        exitButton.tintColor = UIColor(resource: .ypRed)
         addSubview(exitButton)
         self.exitButton = exitButton
     }
