@@ -48,16 +48,28 @@ final class SingleImageViewController: UIViewController {
         let vScale = visibleRectSize.height / imageSize.height
         let scale = min(maxZoomScale, max(minZoomScale, min(hScale, vScale)))
         scrollView.setZoomScale(scale, animated: false)
-        scrollView.layoutIfNeeded()
-        let newContentSize = scrollView.contentSize
-        let x = (newContentSize.width - visibleRectSize.width) / 2
-        let y = (newContentSize.height - visibleRectSize.height) / 2
-        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+        centerImageInScrollView()
+    }
+    
+    private func centerImageInScrollView() {
+        let visibleRectSize = scrollView.bounds.size
+        let imageSize = singleImageView.frame.size
+        let hInset = max((visibleRectSize.width - imageSize.width) / 2, 0)
+        let vInset = max((visibleRectSize.height - imageSize.height) / 2, 0)
+        scrollView.contentInset = UIEdgeInsets(
+            top: vInset,
+            left: hInset,
+            bottom: vInset,
+            right: hInset
+        )
     }
 }
 
 extension SingleImageViewController: UIScrollViewDelegate {
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         singleImageView
+    }
+    func scrollViewDidZoom(_ scrollView: UIScrollView){
+        centerImageInScrollView()
     }
 }
