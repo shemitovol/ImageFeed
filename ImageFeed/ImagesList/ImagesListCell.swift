@@ -1,8 +1,8 @@
 import UIKit
 
-class ImagesListCell: UITableViewCell{
-    @IBOutlet var CellImage: UIImageView!
-    @IBOutlet var DateLabel: UILabel!
-    @IBOutlet var LikeButton: UIButton!
+final class ImagesListCell: UITableViewCell{
+    @IBOutlet var cellImage: UIImageView!
+    @IBOutlet var dateLabel: UILabel!
+    @IBOutlet var likeButton: UIButton!
     static let reuseIdentifier = "ImagesListCell"
 }
