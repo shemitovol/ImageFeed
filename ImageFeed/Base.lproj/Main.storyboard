@@ -91,7 +91,7 @@
         <!--Auth View Controller-->
         <scene sceneID="2sA-ur-IjU">
             <objects>
-                <viewController id="Luq-iQ-AeY" customClass="AuthViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AuthController" id="Luq-iQ-AeY" customClass="AuthViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="TRa-43-4Kf">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="793"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -325,11 +325,11 @@
         <!--Navigation Controller-->
         <scene sceneID="lYe-7H-7ef">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="9qk-Vq-3cj" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="fullScreen" id="9qk-Vq-3cj" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="3xa-06-dHN"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Foq-9c-meq">
-                        <rect key="frame" x="0.0" y="16" width="393" height="54"/>
+                        <rect key="frame" x="0.0" y="59" width="393" height="54"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
