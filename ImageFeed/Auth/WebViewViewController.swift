@@ -10,11 +10,18 @@ protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
-class WebViewViewController: UIViewController {
-    @IBOutlet private var webView: WKWebView!
-    @IBOutlet private var progressView: UIProgressView!
+final class WebViewViewController: UIViewController {
+    
+    // MARK: - IBOutlets
+    
+    @IBOutlet weak private var webView: WKWebView!
+    @IBOutlet weak private var progressView: UIProgressView!
+    
+    // MARK: - Properties
     
     weak var delegate: WebViewViewControllerDelegate?
+    
+    // MARK: - Lifecycle
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -49,6 +56,8 @@ class WebViewViewController: UIViewController {
         }
     }
     
+    // MARK: - Private Methods
+    
     private func updateProgress() {
         progressView.progress = Float(webView.estimatedProgress)
         progressView.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
@@ -74,6 +83,7 @@ class WebViewViewController: UIViewController {
         webView.load(request)
     }
 }
+
 
 extension WebViewViewController: WKNavigationDelegate {
     func webView(
