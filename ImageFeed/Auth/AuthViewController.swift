@@ -46,11 +46,11 @@ extension AuthViewController: WebViewViewControllerDelegate {
         
         vc.dismiss(animated: true)
         
-        ProgressHUD.animate()
+        UIBlockingProgressHUD.show()
         
         oAuthService.fetchOAuthToken(code: code) { result in
             
-            ProgressHUD.dismiss()
+            UIBlockingProgressHUD.dismiss()
             
             switch result {
             case .success(let token):
