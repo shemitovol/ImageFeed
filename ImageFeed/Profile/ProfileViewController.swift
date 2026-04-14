@@ -6,6 +6,7 @@ final class ProfileViewController: UIViewController {
     private lazy var loginLabel = UILabel()
     private lazy var statusLabel = UILabel()
     private lazy var exitButton = UIButton()
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
         view.backgroundColor = UIColor(resource: .ypBlack)
@@ -15,6 +16,25 @@ final class ProfileViewController: UIViewController {
         if let profile = ProfileService.shared.profile {
             updateProfileDetails (with: profile)
         }
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
+    }
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        // TODO [Sprint 11] Обновить аватар, используя Kingfisher
     }
     
     private func updateProfileDetails (with profile: Profile) {
