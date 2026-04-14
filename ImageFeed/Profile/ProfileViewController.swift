@@ -11,6 +11,22 @@ final class ProfileViewController: UIViewController {
         view.backgroundColor = UIColor(resource: .ypBlack)
         setupViews()
         setupConstraints()
+        
+        if let profile = ProfileService.shared.profile {
+            updateProfileDetails (with: profile)
+        }
+    }
+    
+    private func updateProfileDetails (with profile: Profile) {
+        nameLabel.text = profile.name.isEmpty
+            ? "Имя не указано"
+            : profile.name
+        loginLabel.text = profile.loginName.isEmpty
+            ? "@неизвестный пользователь"
+            : profile.loginName
+        statusLabel.text = (profile.bio?.isEmpty ?? true)
+            ? "Профиль не заполнен"
+            : profile.bio
     }
     
     private func setupViews() {
