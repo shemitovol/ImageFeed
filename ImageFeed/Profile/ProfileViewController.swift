@@ -1,7 +1,8 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
-    private lazy var imageView = UIImageView()
+    private var imageView = UIImageView()
     private lazy var nameLabel = UILabel()
     private lazy var loginLabel = UILabel()
     private lazy var statusLabel = UILabel()
@@ -34,7 +35,33 @@ final class ProfileViewController: UIViewController {
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
         else { return }
-        // TODO [Sprint 11] Обновить аватар, используя Kingfisher
+        
+        let placeholderImage = UIImage(systemName: "person.crop.circle.fill")?
+            .withTintColor(.lightGray, renderingMode: .alwaysOriginal)
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 70, weight: .regular, scale: .large))
+
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(
+            with: url,
+            placeholder: placeholderImage,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage
+            ]) { result in
+
+                switch result {
+                    
+                case .success(let value):
+                    print(value.image)
+                    print(value.cacheType)
+                    print(value.source)
+                    
+                case .failure(let error):
+                    print(error)
+                }
+            }
     }
     
     private func updateProfileDetails (with profile: Profile) {
@@ -50,10 +77,11 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupViews() {
-        let profileImage = UIImage(resource: .photo)
-        let imageView = UIImageView(image: profileImage)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 35
         addSubview(imageView)
-        self.imageView = imageView
+
 
         let nameLabel = UILabel()
         nameLabel.text = "Екатерина Новикова"
