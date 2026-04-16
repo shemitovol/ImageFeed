@@ -5,7 +5,7 @@ final class SplashViewController: UIViewController {
     // MARK: - Constants
     
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
-    private let storage = OAuth2TokenStorage()
+    private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
     private var isAlreadyChecked = false
     
