@@ -42,8 +42,6 @@ final class ProfileService {
             for: request
         ) { [weak self] (result: Result<ProfileResult, Error>) in
             
-            guard let self = self else { return }
-            
             switch result {
             case .success(let profileResult):
                 
@@ -54,14 +52,14 @@ final class ProfileService {
                     bio: profileResult.bio
                 )
                 
-                self.profile = profile
+                self?.profile = profile
                 completion(.success(profile))
                 
             case .failure(let error):
                 print("[ProfileService.fetchProfile]: \(error.localizedDescription)")
                 completion(.failure(error))
             }
-            self.task = nil
+            self?.task = nil
         }
         self.task = task
         task.resume()

@@ -8,11 +8,13 @@ final class SplashViewController: UIViewController {
     private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
     private var isAlreadyChecked = false
+    private var imageView: UIImageView!
     
     // MARK: - Lifecycle
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        setupImageView()
         
         guard !isAlreadyChecked else {return}
         isAlreadyChecked = true
@@ -20,7 +22,7 @@ final class SplashViewController: UIViewController {
         if let token = storage.token {
             fetchProfile(token: token)
         } else {
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            presentAuthViewController()
         }
     }
 
@@ -34,7 +36,33 @@ final class SplashViewController: UIViewController {
     }
     
     // MARK: - Private Methods
-
+    
+    private func setupImageView() {
+        let imageSplashScreenLogo = UIImage(resource: .vector)
+        
+        imageView = UIImageView(image: imageSplashScreenLogo)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(imageView)
+        
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
+    private func presentAuthViewController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+        guard let authViewController = storyboard.instantiateViewController(withIdentifier: "AuthController") as? AuthViewController else {
+            assertionFailure("Can't find AuthViewController by identifier")
+            return
+        }
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        DispatchQueue.main.async {
+            self.present(authViewController, animated: true)
+        }
+    }
+    
     private func switchToTabBarController() {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = windowScene.windows.first else {
             assertionFailure("Invalid window configuration")
@@ -87,7 +115,9 @@ extension SplashViewController: AuthViewControllerDelegate {
             switch result {
             case.success(let profile):
                 ProfileImageService.shared.fetchProfileImageURL(username: profile.username){ _ in }
-                switchToTabBarController()
+                DispatchQueue.main.async {
+                    self.switchToTabBarController()
+                }
             case.failure(let error):
                 print("Error getting progile: \(error)")
                 break
