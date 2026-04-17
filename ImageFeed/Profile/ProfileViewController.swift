@@ -1,23 +1,87 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
-    private lazy var imageView = UIImageView()
+    private var imageView = UIImageView()
     private lazy var nameLabel = UILabel()
     private lazy var loginLabel = UILabel()
     private lazy var statusLabel = UILabel()
     private lazy var exitButton = UIButton()
+    private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
         view.backgroundColor = UIColor(resource: .ypBlack)
         setupViews()
         setupConstraints()
+        
+        if let profile = ProfileService.shared.profile {
+            updateProfileDetails (with: profile)
+        }
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
+    }
+    
+    private func updateAvatar() {
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        
+        let placeholderImage = UIImage(systemName: "person.crop.circle.fill")?
+            .withTintColor(.lightGray, renderingMode: .alwaysOriginal)
+            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 70, weight: .regular, scale: .large))
+
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(
+            with: url,
+            placeholder: placeholderImage,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage
+            ]) { result in
+
+                switch result {
+                    
+                case .success(let value):
+                    print(value.image)
+                    print(value.cacheType)
+                    print(value.source)
+                    
+                case .failure(let error):
+                    print(error)
+                }
+            }
+    }
+    
+    private func updateProfileDetails (with profile: Profile) {
+        nameLabel.text = profile.name.isEmpty
+            ? "Имя не указано"
+            : profile.name
+        loginLabel.text = profile.loginName.isEmpty
+            ? "@неизвестный пользователь"
+            : profile.loginName
+        statusLabel.text = (profile.bio?.isEmpty ?? true)
+            ? "Профиль не заполнен"
+            : profile.bio
     }
     
     private func setupViews() {
-        let profileImage = UIImage(resource: .photo)
-        let imageView = UIImageView(image: profileImage)
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 35
         addSubview(imageView)
-        self.imageView = imageView
+
 
         let nameLabel = UILabel()
         nameLabel.text = "Екатерина Новикова"
