@@ -124,7 +124,7 @@ extension SplashViewController: AuthViewControllerDelegate {
                     self.switchToTabBarController()
                 }
             case.failure(let error):
-                print("Error getting progile: \(error)")
+                print("Error getting profile: \(error)")
                 break
             }
         }
