@@ -33,6 +33,7 @@ final class ImagesListService {
             }
             
             if let error = error {
+                print("[ImagesListService.fetchPhotosNextPage]: \(error.localizedDescription)")
                 print(error)
                 return
             }
@@ -62,9 +63,8 @@ final class ImagesListService {
                 }
                 
             } catch {
-                print(error)
+                print("[ImagesListService.fetchPhotosNextPage]: Decoding error - \(error.localizedDescription)")
             }
-            
         }.resume()
     }
     
@@ -102,6 +102,7 @@ final class ImagesListService {
 
             let result: Result<Void, Error>
             if let error = error {
+                print("[ImagesListService.changeLike]: \(error.localizedDescription)")
                 result = .failure(error)
             } else if
                 let httpResponse = response as? HTTPURLResponse,
@@ -123,7 +124,7 @@ final class ImagesListService {
                 }
                 result = .success(())
             } else {
-                result = .failure(NSError(domain: "Invalid response", code: 0))
+                result = .failure(NSError(domain: "[ImagesListService.changeLike]: Invalid response", code: 0))
             }
             DispatchQueue.main.async {
                 completion(result)

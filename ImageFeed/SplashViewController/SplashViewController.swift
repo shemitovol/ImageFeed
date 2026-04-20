@@ -7,7 +7,6 @@ final class SplashViewController: UIViewController {
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
-    private var isAlreadyChecked = false
     private var imageView: UIImageView!
     private var logoutObserver: NSObjectProtocol?
     
@@ -16,10 +15,7 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setupImageView()
-        
-        guard !isAlreadyChecked else {return}
-        isAlreadyChecked = true
-        
+                
         if let token = storage.token {
             fetchProfile(token: token)
         } else {
@@ -70,7 +66,8 @@ final class SplashViewController: UIViewController {
     }
     
     private func switchToTabBarController() {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = windowScene.windows.first else {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
             assertionFailure("Invalid window configuration")
             return
         }
