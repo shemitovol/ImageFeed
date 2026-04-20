@@ -81,3 +81,11 @@ final class ProfileImageService {
         return request
     }
 }
+
+extension ProfileImageService {
+    func reset() {
+        avatarURL = nil
+        task?.cancel()
+        task = nil
+    }
+}

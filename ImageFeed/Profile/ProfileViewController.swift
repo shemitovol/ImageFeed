@@ -140,7 +140,17 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapButton() {
+        ProfileLogoutService.shared.logout()
         
+        guard let windowScene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first,
+            let window = windowScene.windows.first else {
+            return
+        }
+        
+        window.rootViewController = SplashViewController()
+        window.makeKeyAndVisible()
     }
 }
 

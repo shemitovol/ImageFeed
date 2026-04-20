@@ -9,6 +9,7 @@ final class SplashViewController: UIViewController {
     private let profileService = ProfileService.shared
     private var isAlreadyChecked = false
     private var imageView: UIImageView!
+    private var logoutObserver: NSObjectProtocol?
     
     // MARK: - Lifecycle
     
@@ -131,3 +132,8 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
 }
 
+extension SplashViewController {
+    private func handleLogout() {
+        storage.token = nil
+    }
+}

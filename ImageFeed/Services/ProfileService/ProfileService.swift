@@ -77,3 +77,10 @@ final class ProfileService {
     }
 }
 
+extension ProfileService {
+    func reset() {
+        profile = nil
+        task?.cancel()
+        task = nil
+    }
+}
