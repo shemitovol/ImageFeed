@@ -1,9 +1,8 @@
-import UIKit
 import Foundation
 
 final class ImagesListService {
     static let shared = ImagesListService()
-    static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
+    static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     
     private(set) var photos: [Photo] = []
     
@@ -24,30 +23,13 @@ final class ImagesListService {
             return
         }
         
-        session.dataTask(with: request) { [weak self] data, response, error in
-            
-            defer {
-                DispatchQueue.main.async {
-                    self?.isLoading = false
-                }
+        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
+            DispatchQueue.main.async {
+                self?.isLoading = false
             }
             
-            if let error = error {
-                print("[ImagesListService.fetchPhotosNextPage]: \(error.localizedDescription)")
-                print(error)
-                return
-            }
-            
-            guard
-                let httpResponse = response as? HTTPURLResponse,
-                200..<300 ~= httpResponse.statusCode,
-                let data = data
-            else {
-                return
-            }
-            
-            do {
-                let result = try JSONDecoder().decode([PhotoResult].self, from: data)
+            switch result {
+            case .success(let result):
                 let newPhotos = result.map { Photo(from: $0) }
                 
                 DispatchQueue.main.async {
@@ -61,11 +43,14 @@ final class ImagesListService {
                         object: self
                     )
                 }
-                
-            } catch {
-                print("[ImagesListService.fetchPhotosNextPage]: Decoding error - \(error.localizedDescription)")
+            case .failure(let error):
+                if error is DecodingError {
+                        print("[ImagesListService.fetchPhotosNextPage]: Decoding error - \(error.localizedDescription)")
+                    }
+                print("[ImagesListService.fetchPhotosNextPage]: \(error.localizedDescription)")
             }
-        }.resume()
+        }
+        task.resume()
     }
     
     private func makeRequest(page: Int) -> URLRequest? {
@@ -78,11 +63,12 @@ final class ImagesListService {
             URLQueryItem(name: "per_page", value: "10")
         ]
         
-        guard let url = components.url else { return nil }
-        guard let token = OAuth2TokenStorage.shared.token else { return nil }
+        guard let url = components.url,
+              let token = OAuth2TokenStorage.shared.token
+        else { return nil }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = HTTPMethod.get.rawValue
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         return request
@@ -95,7 +81,7 @@ final class ImagesListService {
         guard let url = URL(string: urlString) else { return }
         
         var request = URLRequest(url: url)
-        request.httpMethod = isLike ? "POST" : "DELETE"
+        request.httpMethod = isLike ? HTTPMethod.post.rawValue : HTTPMethod.delete.rawValue
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         session.dataTask(with: request) { [weak self] _, response, error in
