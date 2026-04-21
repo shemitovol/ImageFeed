@@ -107,7 +107,7 @@ final class ProfileViewController: UIViewController {
         let exitButton = UIButton.systemButton(
             with: UIImage(resource: .exit),
             target: self,
-            action: #selector(self.didTapButton)
+            action: #selector(self.showLogoutAlert)
         )
         exitButton.tintColor = UIColor(resource: .ypRed)
         addSubview(exitButton)
@@ -138,9 +138,41 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    @objc
-    private func didTapButton() {
+    private func doLogout() {
+        ProfileLogoutService.shared.logout()
         
+        guard let windowScene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first,
+            let window = windowScene.windows.first else {
+            return
+        }
+        
+        window.rootViewController = SplashViewController()
+        window.makeKeyAndVisible()
+    }
+    
+    @objc
+    private func showLogoutAlert() {
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(
+            title: "Да",
+            style: .default
+        ) {[weak self] _ in
+            self?.doLogout()
+        })
+        
+        alert.addAction(UIAlertAction(
+            title: "Нет",
+            style: .default
+        ))
+        
+        present(alert, animated: true)
     }
 }
 

@@ -7,18 +7,23 @@ final class SplashViewController: UIViewController {
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
-    private var isAlreadyChecked = false
-    private var imageView: UIImageView!
+    private let imageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(resource: .vector))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    private var logoutObserver: NSObjectProtocol?
     
     // MARK: - Lifecycle
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupImageView()
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setupImageView()
-        
-        guard !isAlreadyChecked else {return}
-        isAlreadyChecked = true
-        
+                
         if let token = storage.token {
             fetchProfile(token: token)
         } else {
@@ -38,10 +43,6 @@ final class SplashViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setupImageView() {
-        let imageSplashScreenLogo = UIImage(resource: .vector)
-        
-        imageView = UIImageView(image: imageSplashScreenLogo)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(imageView)
         
         NSLayoutConstraint.activate([
@@ -69,7 +70,8 @@ final class SplashViewController: UIViewController {
     }
     
     private func switchToTabBarController() {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene, let window = windowScene.windows.first else {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
             assertionFailure("Invalid window configuration")
             return
         }
@@ -131,3 +133,8 @@ extension SplashViewController: AuthViewControllerDelegate {
     }
 }
 
+extension SplashViewController {
+    private func handleLogout() {
+        storage.token = nil
+    }
+}
