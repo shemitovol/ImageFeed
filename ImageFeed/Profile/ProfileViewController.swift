@@ -31,9 +31,11 @@ final class ProfileViewController: UIViewController {
 
         nameLabel.textColor = UIColor(resource: .ypWhite)
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
+        nameLabel.accessibilityIdentifier = "nameLabel"
         addSubview(nameLabel)
         loginLabel.textColor = UIColor(resource: .ypGray)
         loginLabel.font = UIFont.systemFont(ofSize: 13)
+        loginLabel.accessibilityIdentifier = "loginLabel"
         addSubview(loginLabel)
         statusLabel.textColor = UIColor(resource: .ypWhite)
         statusLabel.font = UIFont.systemFont(ofSize: 13)
