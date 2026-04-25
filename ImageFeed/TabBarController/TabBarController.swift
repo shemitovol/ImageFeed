@@ -9,8 +9,8 @@ final class TabBarController: UITabBarController {
             return
         }
         
-        let presenter = ImagesListPresenter(service: ImagesListService.shared)
-        imagesListViewController.configure(presenter)
+        let imagesPresenter = ImagesListPresenter(service: ImagesListService.shared)
+        imagesListViewController.configure(imagesPresenter)
         
         imagesListViewController.tabBarItem = UITabBarItem(
             title: "",
@@ -19,6 +19,20 @@ final class TabBarController: UITabBarController {
         )
         
         let profileViewController = ProfileViewController()
+        
+        let profilePresenter = ProfilePresenter(
+            profileService: ProfileService.shared,
+            imageService: ProfileImageService.shared,
+            logoutService: ProfileLogoutService.shared
+        )
+        profileViewController.configure(profilePresenter)
+        
+        profilePresenter.onLogout = { [weak self] in
+            guard let self else { return }
+            let splash = SplashViewController()
+            self.view.window?.rootViewController = splash
+        }
+        
         profileViewController.tabBarItem = UITabBarItem(
             title: "",
             image: UIImage(resource: .tabProfileActive),

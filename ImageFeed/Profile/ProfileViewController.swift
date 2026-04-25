@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 import Kingfisher
 
@@ -7,74 +8,19 @@ final class ProfileViewController: UIViewController {
     private lazy var loginLabel = UILabel()
     private lazy var statusLabel = UILabel()
     private lazy var exitButton = UIButton()
-    private var profileImageServiceObserver: NSObjectProtocol?
+    private var presenter: ProfilePresenterProtocol?
     
     override func viewDidLoad() {
         view.backgroundColor = UIColor(resource: .ypBlack)
         setupViews()
         setupConstraints()
-        
-        if let profile = ProfileService.shared.profile {
-            updateProfileDetails (with: profile)
+        presenter?.viewDidLoad()
+    }
+    
+    func configure(_ presenter: ProfilePresenterProtocol) {
+            self.presenter = presenter
+            presenter.view = self
         }
-        
-        profileImageServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ProfileImageService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] _ in
-                guard let self = self else { return }
-                self.updateAvatar()
-            }
-        updateAvatar()
-    }
-    
-    private func updateAvatar() {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
-        
-        let placeholderImage = UIImage(systemName: "person.crop.circle.fill")?
-            .withTintColor(.lightGray, renderingMode: .alwaysOriginal)
-            .withConfiguration(UIImage.SymbolConfiguration(pointSize: 70, weight: .regular, scale: .large))
-
-        let processor = RoundCornerImageProcessor(cornerRadius: 35)
-        imageView.kf.indicatorType = .activity
-        imageView.kf.setImage(
-            with: url,
-            placeholder: placeholderImage,
-            options: [
-                .processor(processor),
-                .scaleFactor(UIScreen.main.scale),
-                .cacheOriginalImage
-            ]) { result in
-
-                switch result {
-                    
-                case .success(let value):
-                    print(value.image)
-                    print(value.cacheType)
-                    print(value.source)
-                    
-                case .failure(let error):
-                    print(error)
-                }
-            }
-    }
-    
-    private func updateProfileDetails (with profile: Profile) {
-        nameLabel.text = profile.name.isEmpty
-            ? "Имя не указано"
-            : profile.name
-        loginLabel.text = profile.loginName.isEmpty
-            ? "@неизвестный пользователь"
-            : profile.loginName
-        statusLabel.text = (profile.bio?.isEmpty ?? true)
-            ? "Профиль не заполнен"
-            : profile.bio
-    }
     
     private func setupViews() {
         imageView.contentMode = .scaleAspectFill
@@ -83,33 +29,24 @@ final class ProfileViewController: UIViewController {
         addSubview(imageView)
 
 
-        let nameLabel = UILabel()
-        nameLabel.text = "Екатерина Новикова"
         nameLabel.textColor = UIColor(resource: .ypWhite)
         nameLabel.font = UIFont.boldSystemFont(ofSize: 23)
         addSubview(nameLabel)
-        self.nameLabel = nameLabel
-
-        let loginLabel = UILabel()
-        loginLabel.text = "@ekaterina_nov"
         loginLabel.textColor = UIColor(resource: .ypGray)
         loginLabel.font = UIFont.systemFont(ofSize: 13)
         addSubview(loginLabel)
-        self.loginLabel = loginLabel
-
-        let statusLabel = UILabel()
-        statusLabel.text = "Hello, world!"
         statusLabel.textColor = UIColor(resource: .ypWhite)
-        loginLabel.font = UIFont.systemFont(ofSize: 13)
+        statusLabel.font = UIFont.systemFont(ofSize: 13)
         addSubview(statusLabel)
-        self.statusLabel = statusLabel
         
         let exitButton = UIButton.systemButton(
             with: UIImage(resource: .exit),
             target: self,
-            action: #selector(self.showLogoutAlert)
+            action: #selector(showLogoutAlert)
         )
+        
         exitButton.tintColor = UIColor(resource: .ypRed)
+        exitButton.accessibilityIdentifier = "profileExitButton"
         addSubview(exitButton)
         self.exitButton = exitButton
     }
@@ -138,20 +75,6 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
-    private func doLogout() {
-        ProfileLogoutService.shared.logout()
-        
-        guard let windowScene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene })
-            .first,
-            let window = windowScene.windows.first else {
-            return
-        }
-        
-        window.rootViewController = SplashViewController()
-        window.makeKeyAndVisible()
-    }
-    
     @objc
     private func showLogoutAlert() {
         let alert = UIAlertController(
@@ -164,7 +87,7 @@ final class ProfileViewController: UIViewController {
             title: "Да",
             style: .default
         ) {[weak self] _ in
-            self?.doLogout()
+            self?.presenter?.didTapLogout()
         })
         
         alert.addAction(UIAlertAction(
@@ -176,3 +99,20 @@ final class ProfileViewController: UIViewController {
     }
 }
 
+extension ProfileViewController: ProfileViewControllerProtocol {
+    func displayProfile(_ viewModel: ProfileViewModel) {
+        nameLabel.text = viewModel.name
+        loginLabel.text = viewModel.login
+        statusLabel.text = viewModel.bio
+    }
+    
+    func displayAvatar(url: URL?) {
+        let placeholder = UIImage(systemName: "person.crop.circle.fill")
+        
+        if let url {
+            imageView.kf.setImage(with: url, placeholder: placeholder)
+        } else {
+            imageView.image = placeholder
+        }
+    }
+}
