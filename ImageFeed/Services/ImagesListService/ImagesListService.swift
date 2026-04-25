@@ -2,7 +2,11 @@ import Foundation
 
 final class ImagesListService {
     static let shared = ImagesListService()
-    static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
+    static let didChangeNotificationName = Notification.Name("ImagesListServiceDidChange")
+
+    var didChangeNotification: Notification.Name {
+        Self.didChangeNotificationName
+    }
     
     private(set) var photos: [Photo] = []
     
@@ -39,7 +43,7 @@ final class ImagesListService {
                     self.currentPage = nextPage
                     
                     NotificationCenter.default.post(
-                        name: Self.didChangeNotification,
+                        name: Self.didChangeNotificationName,
                         object: self
                     )
                 }
@@ -74,7 +78,7 @@ final class ImagesListService {
         return request
     }
     
-    func changeLike( photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+    func changeLike( photoId: String, isLike: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
         guard let token = OAuth2TokenStorage.shared.token else { return }
         
         let urlString = "https://api.unsplash.com/photos/\(photoId)/like"
@@ -126,3 +130,5 @@ extension ImagesListService {
         isLoading = false
     }
 }
+
+extension ImagesListService: ImagesListServiceProtocol {}
