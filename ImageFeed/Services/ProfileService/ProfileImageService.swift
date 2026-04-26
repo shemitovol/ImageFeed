@@ -20,9 +20,8 @@ struct ProfileImage: Codable {
     }
 }
 
-final class ProfileImageService {
+final class ProfileImageService: ProfileImageServiceProtocol {
     static let shared = ProfileImageService()
-    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     private init () {}
     
     private(set) var avatarURL: String?
@@ -54,12 +53,6 @@ final class ProfileImageService {
                 let url = userResult.profileImage.small
                 self.avatarURL = url
                 completion(.success(url))
-                
-                NotificationCenter.default
-                    .post(
-                        name: ProfileImageService.didChangeNotification,
-                        object: self,
-                        userInfo: ["URL": userResult.profileImage.small])
 
             case .failure(let error):
                 print("[ProfileImageService.fetchProfileImageURL]: \(error.localizedDescription)")

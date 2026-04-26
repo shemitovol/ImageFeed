@@ -23,6 +23,12 @@ final class ImagesListCell: UITableViewCell{
         cellImage.image = nil
     }
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        likeButton.isAccessibilityElement = true
+        likeButton.accessibilityIdentifier = "likeButton"
+    }
+    
     func setIsLiked (_ isLiked: Bool) {
         let image = UIImage(resource: isLiked ? .active : .noActive)
         likeButton.setImage(image, for: .normal)
