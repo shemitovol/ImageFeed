@@ -3,17 +3,33 @@ import UIKit
 
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     
+    // MARK: Properties
+    
     weak var view: ImagesListViewProtocol?
     private let service: ImagesListServiceProtocol
     private var photos: [Photo] = []
+    var photosCount: Int {
+        photos.count
+    }
+    
+    // MARK: Init
     
     init(service: ImagesListServiceProtocol) {
         self.service = service
     }
     
-    var photosCount: Int {
-        photos.count
+    // MARK: Private Methods
+    
+    @objc
+    private func didChangePhotos() {
+        let oldCount = photos.count
+        let newPhotos = service.photos
+        guard newPhotos.count > oldCount else { return }
+        photos = newPhotos
+        view?.updateTableView(oldCount: oldCount, newCount: newPhotos.count)
     }
+    
+    // MARK: Lifecycle
     
     func viewDidLoad() {
         photos = service.photos
@@ -28,14 +44,7 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         service.fetchPhotosNextPage()
     }
     
-    @objc
-    private func didChangePhotos() {
-        let oldCount = photos.count
-        let newPhotos = service.photos
-        guard newPhotos.count > oldCount else { return }
-        photos = newPhotos
-        view?.updateTableView(oldCount: oldCount, newCount: newPhotos.count)
-    }
+    // MARK: Public Methods
     
     func photo(at index: Int) -> Photo {
         guard index < photos.count else { fatalError("Index out of range") }
